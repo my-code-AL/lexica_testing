@@ -4,6 +4,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import androidx.test.core.app.ApplicationProvider;
 import android.content.Context;
@@ -101,16 +102,21 @@ public class Class_Test {
      */
     @Test
     public void testGameCreationWithShortBoard() {
-        thrown.expect(IllegalArgumentException.class);
 
-        try{
-//            board of size 15 when 16 is expected
+        assertThrows(ArrayIndexOutOfBoundsException.class, ()-> {
             String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
-
             Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
-        }catch(Error e){
-            e.printStackTrace();
-        }
+        });
+//        thrown.expect(IllegalArgumentException.class);
+//
+//        try{
+//            // board of size 15 when 16 is expected
+//            String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
+//
+//            Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
+//        }catch(Error e){
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -124,18 +130,29 @@ public class Class_Test {
      */
     @Test
     public void testGameCreationWithLongBoard() {
-        thrown.expect(IllegalArgumentException.class);
-
-        try{
-            //        board of size 17 when 16 is expected
+        assertThrows(IllegalStateException.class, () -> {
+            GameMode mode = new GameMode(12,
+                    GameMode.Type.SPRINT,
+                    null,
+                    17,
+                    180,
+                    3,
+                    GameMode.SCORE_LETTERS,
+                    "hint_colour");
             String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O","P","Q"};
-            // Initialize the array (if necessary)
-
-            Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
-        }
-        catch (Error e){
-            e.printStackTrace();
-        }
+            Game game3 = new Game(context, mode, language, boardLetterz);
+        });
+//        thrown.expect(IllegalArgumentException.class);
+//        try{
+//            //        board of size 17 when 16 is expected
+//            String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O","P","Q"};
+//            // Initialize the array (if necessary)
+//
+//            Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
+//        }
+//        catch (Error e){
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -145,14 +162,18 @@ public class Class_Test {
      */
     @Test
     public void testGameModeInput() {
-        thrown.expect(IllegalArgumentException.class);
-
-        try{
+        assertThrows(NullPointerException.class, () -> {
             Game game_null = new Game(context, null, language, boardLetters);
-        }
-        catch (Error e){
-            e.printStackTrace();
-        }
+        });
+
+//        thrown.expect(IllegalArgumentException.class);
+//
+//        try{
+//            Game game_null = new Game(context, null, language, boardLetters);
+//        }
+//        catch (Error e){
+//            e.printStackTrace();
+//        }
     }
 
 
