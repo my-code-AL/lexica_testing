@@ -287,4 +287,7 @@ public class GameActivity extends AppCompatActivity implements Synchronizer.Fina
         saveGameTransient(outState);
     }
 
+    public Game getGame() {
+        return game;
+    }
 }

@@ -86,6 +86,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
 
     implementation 'androidx.room:room-runtime:2.2.6'
+    implementation 'androidx.test.espresso:espresso-intents:3.5.1'
     kapt 'androidx.room:room-compiler:2.2.6'
 
     testImplementation "junit:junit:4.13.1"

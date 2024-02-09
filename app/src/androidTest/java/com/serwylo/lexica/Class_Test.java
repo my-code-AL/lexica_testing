@@ -79,16 +79,31 @@ public class Class_Test {
 
         String currentboard = game.getBoard().toString();
         System.out.println(currentboard);
-        String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"};
+        String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Z"};
         Game game2 = new Game(context, mode, language, boardLetterz);
 
-        String expected = "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P";
+        String expected = "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,Z";
         String actual = game2.getBoard().toString();
 
         assertNotNull(game2.getBoard());
         assertEquals(expected,actual);
 
     }
+
+    @Test
+    public void testBoardInputUnicode() {
+        String currentboard = game.getBoard().toString();
+        System.out.println(currentboard);
+        String[] boardLetterz = {"À", "Á", "è", "ņ", "Ǯ", "Ṍ", "Ṹ", "ỹ", "ʎ", "ή", "ϕ", "Є", "Ӊ", "Ӵ", "ڡ", "㆟"};
+        Game game2 = new Game(context, mode, language, boardLetterz);
+
+        String expected = "À,Á,è,ņ,Ǯ,Ṍ,Ṹ,ỹ,ʎ,ή,ϕ,Є,Ӊ,Ӵ,ڡ,㆟";
+        String actual = game2.getBoard().toString();
+
+        assertNotNull(game2.getBoard());
+        assertEquals(expected,actual);
+    }
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -102,22 +117,10 @@ public class Class_Test {
      */
     @Test
     public void testGameCreationWithShortBoard() {
-
         assertThrows(ArrayIndexOutOfBoundsException.class, ()-> {
             String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
             Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
         });
-//        thrown.expect(IllegalArgumentException.class);
-//
-//        try{
-//            // board of size 15 when 16 is expected
-//            String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
-//
-//            Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
-//        }catch(Error e){
-//            e.printStackTrace();
-//        }
-
     }
 
     /**
@@ -142,17 +145,6 @@ public class Class_Test {
             String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O","P","Q"};
             Game game3 = new Game(context, mode, language, boardLetterz);
         });
-//        thrown.expect(IllegalArgumentException.class);
-//        try{
-//            //        board of size 17 when 16 is expected
-//            String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O","P","Q"};
-//            // Initialize the array (if necessary)
-//
-//            Game game3 = new Game(context, mode, language, boardLetterz); // Replace with actual parameters
-//        }
-//        catch (Error e){
-//            e.printStackTrace();
-//        }
     }
 
     /**
@@ -165,20 +157,23 @@ public class Class_Test {
         assertThrows(NullPointerException.class, () -> {
             Game game_null = new Game(context, null, language, boardLetters);
         });
-
-//        thrown.expect(IllegalArgumentException.class);
-//
-//        try{
-//            Game game_null = new Game(context, null, language, boardLetters);
-//        }
-//        catch (Error e){
-//            e.printStackTrace();
-//        }
     }
 
+    @Test
+    @Ignore("case not covered in game")
+    public void testInvalidAsciiInput() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            String[] boardLetterz = {"{", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"};
+            Game game_null = new Game(context, mode, language, boardLetters);
+        });
+    }
 
-
-
-
-
+    @Test
+    @Ignore("case not covered in game")
+    public void testInvalidUnicodeInput() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            String[] boardLetterz = {"㈀", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"};
+            Game game_null = new Game(context, mode, language, boardLetters);
+        });
+    }
 }
