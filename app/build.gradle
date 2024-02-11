@@ -23,6 +23,9 @@ android {
             minifyEnabled false
             shrinkResources false
         }
+        debug {
+            testCoverageEnabled true
+        }
     }
 
     buildFeatures {
