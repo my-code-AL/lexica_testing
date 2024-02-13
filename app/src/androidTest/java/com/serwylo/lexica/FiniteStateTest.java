@@ -6,6 +6,7 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -41,6 +42,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Collection;
+import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 public class FiniteStateTest {
@@ -48,37 +50,12 @@ public class FiniteStateTest {
     @Rule
     public IntentsTestRule<MainMenuActivity> activityRule = new IntentsTestRule<>(MainMenuActivity.class);
 
-
     @Test
-    public void testGameStartToGameRunning() {
+    public void testMainMenuToGame() {
         ActivityScenario<MainMenuActivity> scenario = ActivityScenario.launch(MainMenuActivity.class);
-        onView(allOf(withId(R.id.new_game), isDisplayed()));
+        onView(allOf(withId(R.id.game_mode), isDisplayed()));
         // Verify that the activity is displayed on the screen
-        Espresso.onView(allOf(withId(R.id.new_game))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
-        // Click a button (assuming the button has an ID, change it accordingly)
-        Espresso.onView(ViewMatchers.withId(R.id.new_game)).perform(ViewActions.click());
-
-        // Wait for the next activity to be launched
-        Intents.intended(IntentMatchers.hasAction("com.serwylo.lexica.action.NEW_GAME"));
-
-        // Get the resulting activity
-        Activity resultActivity = getActivityInstance();
-        GameActivity gameActivity = (GameActivity) resultActivity;
-        Game game = gameActivity.getGame();
-        assertEquals(game.getStatus(), Game.GameStatus.GAME_RUNNING);
-
-        // Perform assertions or verifications on the ResultActivity if needed
-        // For example, you can check if certain views are displayed in the ResultActivity
-        Espresso.onView(ViewMatchers.withId(R.id.game_wrapper)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
-
-    @Test
-    public void testGameStartedAndRunningToPaused() {
-        ActivityScenario<MainMenuActivity> scenario = ActivityScenario.launch(MainMenuActivity.class);
-        onView(allOf(withId(R.id.new_game), isDisplayed()));
-        // Verify that the activity is displayed on the screen
-        Espresso.onView(allOf(withId(R.id.new_game))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        Espresso.onView(allOf(withId(R.id.game_mode_button))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
         // Click a button (assuming the button has an ID, change it accordingly)
         Espresso.onView(ViewMatchers.withId(R.id.new_game)).perform(ViewActions.click());
@@ -100,7 +77,145 @@ public class FiniteStateTest {
         Intents.intended(IntentMatchers.hasComponent(MainMenuActivity.class.getName()));
 
         assertEquals(game.getStatus(), Game.GameStatus.GAME_PAUSED);
+
+        // Check Restore Screen Path
+        onView(allOf(withId(R.id.restore_game), isDisplayed()));
+        Espresso.onView(allOf(withId(R.id.restore_game))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        Espresso.onView(ViewMatchers.withId(R.id.restore_game)).perform(ViewActions.click());
+
+        Intents.intended(IntentMatchers.hasAction("com.serwylo.lexica.action.RESTORE_GAME"));
+        Espresso.onView(ViewMatchers.withId(R.id.game_wrapper)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        // Check Rotate Screen Path
+        onView(withId(R.id.rotate)).perform(click());
+        Espresso.onView(ViewMatchers.withId(R.id.game_wrapper)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        // Check End Game Path
+        Espresso.openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().getTargetContext());
+
+        Espresso.onView(withText("End Game")).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withText("End Game")).perform(click());
+
+        Espresso.onView(withText("END GAME")).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withText("END GAME")).perform(click());
+
+        // Check Score Screen related path
+        Intents.intended(IntentMatchers.hasAction("com.serwylo.lexica.action.SCORE"));
+
+        onView(withId(R.id.found_words_button)).check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.missed_words_button)).check(ViewAssertions.matches(isDisplayed()));
+        onView(withId(R.id.found_words_button)).perform(click());
+        onView(withId(R.id.missed_words_button)).perform(click());
+
+        onView(withId(R.id.toolbar)).check(ViewAssertions.matches(isDisplayed()));
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+
+        Intents.intended(IntentMatchers.hasComponent(MainMenuActivity.class.getName()));
     }
+
+    @Test
+    public void testMainMenuToLexiconToMainMenu() {
+        ActivityScenario<MainMenuActivity> scenario = ActivityScenario.launch(MainMenuActivity.class);
+
+        onView(allOf(withId(R.id.language_button), isDisplayed()));
+
+        // Verify that the activity is displayed on the screen
+        Espresso.onView(allOf(withId(R.id.language_button))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        // Click a button (assuming the button has an ID, change it accordingly)
+        Espresso.onView(ViewMatchers.withId(R.id.language_button)).perform(ViewActions.click());
+
+        // Wait for the next activity to be launched
+        Intents.intended(IntentMatchers.hasComponent("com.serwylo.lexica.ChooseLexiconActivity"));
+
+        // Get the resulting activity
+        Activity resultActivity = getActivityInstance();
+        ChooseLexiconActivity lexiconActivity = (ChooseLexiconActivity) resultActivity;
+
+        // Perform assertions or verifications on the ResultActivity if needed
+        // For example, you can check if certain views are displayed in the ResultActivity
+        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+
+        Intents.intended(IntentMatchers.hasComponent(MainMenuActivity.class.getName()));
+    }
+
+    @Test
+    public void testMainMenuToMutliplayer() {
+        ActivityScenario<MainMenuActivity> scenario = ActivityScenario.launch(MainMenuActivity.class);
+
+        onView(allOf(withId(R.id.new_multiplayer_game), isDisplayed()));
+
+        // Verify that the activity is displayed on the screen
+        Espresso.onView(allOf(withId(R.id.new_multiplayer_game))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        // Click a button (assuming the button has an ID, change it accordingly)
+        Espresso.onView(ViewMatchers.withId(R.id.new_multiplayer_game)).perform(ViewActions.click());
+
+        // Wait for the next activity to be launched
+        Intents.intended(IntentMatchers.hasComponent("com.serwylo.lexica.activities.NewMultiplayerActivity"));
+
+        // Get the resulting activity
+        Activity resultActivity = getActivityInstance();
+
+        // Perform assertions or verifications on the ResultActivity if needed
+        // For example, you can check if certain views are displayed in the ResultActivity
+        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+
+        Intents.intended(IntentMatchers.hasComponent(MainMenuActivity.class.getName()));
+    }
+    @Test
+    public void testMainMenuToGameModeToMainMenu() {
+        ActivityScenario<MainMenuActivity> scenario = ActivityScenario.launch(MainMenuActivity.class);
+
+        onView(allOf(withId(R.id.game_mode_button), isDisplayed()));
+
+        // Verify that the activity is displayed on the screen
+        Espresso.onView(allOf(withId(R.id.game_mode_button))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        // Click a button (assuming the button has an ID, change it accordingly)
+        Espresso.onView(ViewMatchers.withId(R.id.game_mode_button)).perform(ViewActions.click());
+
+        // Wait for the next activity to be launched
+        Intents.intended(IntentMatchers.hasComponent("com.serwylo.lexica.ChooseGameModeActivity"));
+
+        // Get the resulting activity
+        Activity resultActivity = getActivityInstance();
+
+        // Perform assertions or verifications on the ResultActivity if needed
+        // For example, you can check if certain views are displayed in the ResultActivity
+        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+
+        Intents.intended(IntentMatchers.hasComponent(MainMenuActivity.class.getName()));
+    }
+    @Test
+    public void testMainMenuToHighScoreToMainMneu() {
+        ActivityScenario<MainMenuActivity> scenario = ActivityScenario.launch(MainMenuActivity.class);
+
+        onView(allOf(withId(R.id.high_score), isDisplayed()));
+
+        // Verify that the activity is displayed on the screen
+        Espresso.onView(allOf(withId(R.id.high_score))).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        // Click a button (assuming the button has an ID, change it accordingly)
+        Espresso.onView(ViewMatchers.withId(R.id.high_score)).perform(ViewActions.click());
+
+        // Wait for the next activity to be launched
+        Intents.intended(IntentMatchers.hasComponent("com.serwylo.lexica.activities.HighScoresActivity"));
+
+        // Get the resulting activity
+        Activity resultActivity = getActivityInstance();
+
+        // Perform assertions or verifications on the ResultActivity if needed
+        // For example, you can check if certain views are displayed in the ResultActivity
+        Espresso.onView(ViewMatchers.withId(R.id.toolbar)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+
+        Intents.intended(IntentMatchers.hasComponent(MainMenuActivity.class.getName()));
+    }
+
 
     private Activity getActivityInstance() {
         // This method helps to get the current activity instance
