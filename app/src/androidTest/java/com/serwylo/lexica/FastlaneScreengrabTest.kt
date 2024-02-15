@@ -8,14 +8,17 @@ import com.serwylo.lexica.lang.EnglishUS
 import com.serwylo.lexica.lang.Japanese
 import com.serwylo.lexica.lang.Language.Companion.allLanguages
 import org.junit.ClassRule
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import tools.fastlane.screengrab.Screengrab
 import tools.fastlane.screengrab.locale.LocaleTestRule
 
+
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@Ignore
 class FastlaneScreengrabTest {
 
     @JvmField

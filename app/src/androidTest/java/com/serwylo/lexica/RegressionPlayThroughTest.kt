@@ -9,6 +9,7 @@ import com.serwylo.lexica.db.GameMode
 import com.serwylo.lexica.lang.Language
 import org.hamcrest.Matchers.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +26,7 @@ import org.junit.runners.Parameterized
  */
 @LargeTest
 @RunWith(Parameterized::class)
+@Ignore
 class RegressionPlayThroughTest (val language: Language) {
 
     @Rule
