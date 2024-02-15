@@ -19,8 +19,6 @@ package com.serwylo.lexica.game;
 
 import net.healeys.trie.TransitionMap;
 
-import java.util.List;
-
 public abstract class Board implements TransitionMap {
     private String[] board;
     private Integer[] positions;

@@ -261,7 +261,7 @@ public class Game implements Synchronizer.Counter {
         initializeDictionary(context);
     }
 
-    private void loadSounds(Context context) {
+    public void loadSounds(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         if (prefs.getBoolean("soundsEnabled", false)) {
