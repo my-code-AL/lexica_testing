@@ -95,8 +95,8 @@ public class Game implements Synchronizer.Counter {
     private GameStatus status;
     private RotateHandler mRotateHandler;
 
-    private LinkedList<String> wordList;
-    private LinkedHashSet<String> wordsUsed;
+    public LinkedList<String> wordList;
+    public LinkedHashSet<String> wordsUsed;
     private int wordCount;
     private final SparseIntArray wordCountsByLength = new SparseIntArray();
     private final SparseIntArray maxWordCountsByLength = new SparseIntArray();
@@ -417,6 +417,60 @@ public class Game implements Synchronizer.Counter {
         }
         wordsUsed.add(cap);
     }
+    public void AddWord(String word) {
+        String cap = normalizeWord(word);
+
+        if (isWord(cap)) {
+            if (wordsUsed.contains(cap)) {
+                handlePreviouslyFoundWord(word);
+            } else {
+                handleNewWord(cap, word);
+            }
+        } else {
+            handleInvalidWord(word);
+        }
+        wordsUsed.add(cap);
+    }
+
+    private boolean isGameRunning() {
+        return status == GameStatus.GAME_RUNNING;
+    }
+
+    private String normalizeWord(String word) {
+        return word.toLowerCase(language.getLocale());
+    }
+
+    private void handlePreviouslyFoundWord(String word) {
+        wordList.addFirst("+" + word);
+        playSound(SOUND_WORD_ALREADYFOUND);
+    }
+
+    private void handleNewWord(String cap, String word) {
+        wordCount++;
+        score += getWordScore(cap);
+        updateWordCountByLength(cap);
+        wordList.addFirst(word);
+        playSound(SOUND_WORD_GOOD);
+        removeWeight(cap);
+        checkEndCondition();
+    }
+
+    private void updateWordCountByLength(String cap) {
+        wordCountsByLength.put(cap.length(), wordCountsByLength.get(cap.length()) + 1);
+    }
+
+
+    private void checkEndCondition() {
+        if (wordCount == solutions.size()) {
+            endNow();
+        }
+    }
+
+    private void handleInvalidWord(String word) {
+        wordList.addFirst(word);
+        playSound(SOUND_WORD_BAD);
+    }
+
 
     public int getWordScore(String word) {
         if (GameMode.SCORE_WORDS.equals(gameMode.getScoreType())) {

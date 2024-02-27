@@ -2,14 +2,24 @@ package com.serwylo.lexica;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+import androidx.preference.PreferenceManager;
 import androidx.test.core.app.ApplicationProvider;
 import android.content.Context;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+
 import androidx.test.platform.app.InstrumentationRegistry;
 import com.serwylo.lexica.db.GameMode;
 import com.serwylo.lexica.game.Board;
@@ -20,6 +30,14 @@ import com.serwylo.lexica.lang.Language;
 import org.junit.rules.ExpectedException;
 
 import org.junit.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.internal.stubbing.BaseStubbing;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Objects;
 
 //GAME MODES ARE AS FOLLOWS
 //enum class Type {
@@ -40,10 +58,60 @@ public class Class_Test {
 
     private static Language language;
     private static String[] boardLetters;
+    private static Language realObject;
+    private static Language spyObject;
+    @Mock
+    GameMode mockGameMode;
 
+    @Test
+    public void setUp() {
+        context = ApplicationProvider.getApplicationContext();
+
+        realObject = new EnglishUS();
+        spyObject = Mockito.spy(realObject);
+        int n = realObject.getPointsForLetter("a");
+        System.out.println(n);
+
+// Now you can mock specific methods on the spyObject
+        when(spyObject.getPointsForLetter("a")).thenReturn(4);
+        int score = spyObject.getPointsForLetter("a");
+        System.out.println(score);
+
+
+    }
+    @Test
+    public void testGameInitialization() {
+        // Create your GameMode and language objects
+        GameMode mode = new GameMode(12,
+                GameMode.Type.SPRINT,
+                null,
+                16,
+                180,
+                3,
+                GameMode.SCORE_LETTERS,
+                "hint_colour");
+        Language language = new EnglishUS(); // Example language
+
+        // Initialize game with mocked context and other dependencies
+        Game game = new Game(context, mode, spyObject, null);
+
+        // Perform any assertions or verifications to test the game's initialization logic
+        assertNotNull(game);
+        System.out.println(game.getScore());
+
+        // ... additional assertions and verifications ...
+    }
     @BeforeClass
     public static void setup(){
+
         context = ApplicationProvider.getApplicationContext();
+//        Context Context = mock(Context.class);
+//        Resources resources = mock(Resources.class);
+//
+//        // Stubbing - Define the behavior of the mock when certain methods are called
+//        when(Context.getResources()).thenReturn(resources);
+//        when(resources.getString(anyInt())).thenReturn("Mocked Game Name");
+
         prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         mode = new GameMode(12,
                 GameMode.Type.SPRINT,
@@ -71,7 +139,30 @@ public class Class_Test {
         assertNotNull(prefs);
         assertNotNull(game);
         assertNotNull(game.getLanguage());
+        game.getGameMode();
 
+    }
+
+
+//  WE ARE TESTING OUR REFACTORED addWord method here
+//    this method is called AddWord
+    @Test
+    public void testGetWord(){
+        game.AddWord("dog");
+        boolean ans = game.wordsUsed.contains("dog");
+        assertTrue(ans);
+
+//        assertTrue(game.wordsUsed.contains("dog"));
+    }
+    @Test
+    public void testGetWordInvalid(){
+        game.AddWord("ZaToucherooni");
+        boolean ans = game.wordsUsed.contains("ZaToucherooni");
+        assertFalse(ans);
+        boolean other_ans =game.wordList.contains("ZaToucherooni");
+        assertTrue(other_ans);
+
+//        assertTrue(game.wordsUsed.contains("dog"));
     }
 
     @Test
@@ -175,5 +266,9 @@ public class Class_Test {
             String[] boardLetterz = {"㈀", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"};
             Game game_null = new Game(context, mode, language, boardLetters);
         });
+    }
+    @Test
+    public void testWithMockObj(){
+
     }
 }
