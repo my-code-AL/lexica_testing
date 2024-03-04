@@ -1,6 +1,8 @@
 plugins {
     id 'kotlin'
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    id 'checkstyle'
+
 }
 
 dependencies {

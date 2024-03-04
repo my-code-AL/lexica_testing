@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import androidx.preference.PreferenceManager;
@@ -35,9 +36,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.stubbing.BaseStubbing;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 //GAME MODES ARE AS FOLLOWS
 //enum class Type {
@@ -50,7 +53,8 @@ import java.util.Objects;
 //}
 public class Class_Test {
 
-
+    private GameSaver mockSaver;
+    private Context mockContext;
     private static GameMode mode;
     private static Context context;
     private static SharedPreferences prefs;
@@ -63,22 +67,22 @@ public class Class_Test {
     @Mock
     GameMode mockGameMode;
 
-    @Test
-    public void setUp() {
-        context = ApplicationProvider.getApplicationContext();
-
-        realObject = new EnglishUS();
-        spyObject = Mockito.spy(realObject);
-        int n = realObject.getPointsForLetter("a");
-        System.out.println(n);
-
-// Now you can mock specific methods on the spyObject
-        when(spyObject.getPointsForLetter("a")).thenReturn(4);
-        int score = spyObject.getPointsForLetter("a");
-        System.out.println(score);
-
-
-    }
+//    @BeforeClass
+//    public void setUp() {
+//        context = ApplicationProvider.getApplicationContext();
+//
+//        realObject = new EnglishUS();
+//        spyObject = Mockito.spy(realObject);
+//        int n = realObject.getPointsForLetter("a");
+//        System.out.println(n);
+//
+//// Now you can mock specific methods on the spyObject
+//        when(spyObject.getPointsForLetter("a")).thenReturn(4);
+//        int score = spyObject.getPointsForLetter("a");
+//        System.out.println(score);
+//
+//
+//    }
     @Test
     public void testGameInitialization() {
         // Create your GameMode and language objects
@@ -91,11 +95,18 @@ public class Class_Test {
                 GameMode.SCORE_LETTERS,
                 "hint_colour");
         Language language = new EnglishUS(); // Example language
-
+        realObject = new EnglishUS();
+        spyObject = Mockito.spy(realObject);
         // Initialize game with mocked context and other dependencies
         Game game = new Game(context, mode, spyObject, null);
 
         // Perform any assertions or verifications to test the game's initialization logic
+
+        //Now you can mock specific methods on the spyObject
+        when(spyObject.getPointsForLetter("a")).thenReturn(4);
+        int score = spyObject.getPointsForLetter("a");
+        System.out.println(score);
+        assertTrue(score==4);
         assertNotNull(game);
         System.out.println(game.getScore());
 
@@ -105,13 +116,6 @@ public class Class_Test {
     public static void setup(){
 
         context = ApplicationProvider.getApplicationContext();
-//        Context Context = mock(Context.class);
-//        Resources resources = mock(Resources.class);
-//
-//        // Stubbing - Define the behavior of the mock when certain methods are called
-//        when(Context.getResources()).thenReturn(resources);
-//        when(resources.getString(anyInt())).thenReturn("Mocked Game Name");
-
         prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         mode = new GameMode(12,
                 GameMode.Type.SPRINT,
@@ -271,4 +275,50 @@ public class Class_Test {
     public void testWithMockObj(){
 
     }
+    @Before
+    public void setUp() {
+        // Create mock objects for GameSaver and Context
+        mockSaver = mock(GameSaverTransient.class);
+        mockContext = mock(Context.class);
+        GameMode mode = new GameMode(12,
+                GameMode.Type.SPRINT,
+                null,
+                17,
+                180,
+                3,
+                GameMode.SCORE_LETTERS,
+                "hint_colour");
+        Date date = new Date();
+        String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O","P","Q"};
+        // Stub the methods of GameSaver to return dummy values
+        when(mockSaver.readGameMode()).thenReturn(mode); // replace with appropriate GameMode
+        when(mockSaver.readLanguage()).thenReturn(new EnglishUS());
+        when(mockSaver.readGameBoard()).thenReturn(boardLetterz); // replace with appropriate game board representation
+        when(mockSaver.readTimeRemainingInMillis()).thenReturn(30000L);
+        when(mockSaver.readStart()).thenReturn(date);
+        when(mockSaver.readWords()).thenReturn(new String[] {"word1", "word2"});
+        when(mockSaver.readWordCount()).thenReturn(1738);
+        when(mockSaver.readStatus()).thenReturn(Game.GameStatus.GAME_STARTING);
+
+        // If your actual code uses more methods from the saver or context, stub them here as well
+    }
+
+
+    @Test
+    public void testGameConstructor() {
+        // Test the Game constructor
+        Game game = new Game(context, mockSaver);
+        // Verify that all interactions with the GameSaver happened as expected
+        verify(mockSaver).readGameMode();
+        verify(mockSaver).readLanguage();
+        verify(mockSaver).readTimeRemainingInMillis();
+        verify(mockSaver).readStart();
+        verify(mockSaver).readWords();
+
+
+
+        assertEquals(Game.GameStatus.GAME_STARTING, game.getStatus());
+        assertNotNull(game.getBoard());
+    }
+
 }
