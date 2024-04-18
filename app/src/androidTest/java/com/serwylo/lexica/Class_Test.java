@@ -4,26 +4,17 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import androidx.preference.PreferenceManager;
 import androidx.test.core.app.ApplicationProvider;
 import android.content.Context;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import com.serwylo.lexica.db.GameMode;
-import com.serwylo.lexica.game.Board;
 import com.serwylo.lexica.game.Game;
 import com.serwylo.lexica.lang.EnglishUS;
 import com.serwylo.lexica.lang.Language;
@@ -33,14 +24,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.internal.stubbing.BaseStubbing;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.ResourceBundle;
 
 //GAME MODES ARE AS FOLLOWS
 //enum class Type {
@@ -101,6 +86,7 @@ public class Class_Test {
         Game game = new Game(context, mode, spyObject, null);
 
         // Perform any assertions or verifications to test the game's initialization logic
+        when(spyObject.getPointsForLetter("w")).thenReturn(0);
 
         //Now you can mock specific methods on the spyObject
         when(spyObject.getPointsForLetter("a")).thenReturn(4);
@@ -111,7 +97,9 @@ public class Class_Test {
         System.out.println(game.getScore());
 
         // ... additional assertions and verifications ...
+        assertTrue(spyObject.getPointsForLetter("w") == 0);
     }
+
     @BeforeClass
     public static void setup(){
 
@@ -155,8 +143,6 @@ public class Class_Test {
         game.AddWord("dog");
         boolean ans = game.wordsUsed.contains("dog");
         assertTrue(ans);
-
-//        assertTrue(game.wordsUsed.contains("dog"));
     }
     @Test
     public void testGetWordInvalid(){
@@ -275,8 +261,8 @@ public class Class_Test {
     public void testWithMockObj(){
 
     }
-    @Before
-    public void setUp() {
+    @Test
+    public void testMock() {
         // Create mock objects for GameSaver and Context
         mockSaver = mock(GameSaverTransient.class);
         mockContext = mock(Context.class);
@@ -290,9 +276,10 @@ public class Class_Test {
                 "hint_colour");
         Date date = new Date();
         String[] boardLetterz = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O","P","Q"};
+        EnglishUS eus = new EnglishUS();
         // Stub the methods of GameSaver to return dummy values
         when(mockSaver.readGameMode()).thenReturn(mode); // replace with appropriate GameMode
-        when(mockSaver.readLanguage()).thenReturn(new EnglishUS());
+        when(mockSaver.readLanguage()).thenReturn(eus);
         when(mockSaver.readGameBoard()).thenReturn(boardLetterz); // replace with appropriate game board representation
         when(mockSaver.readTimeRemainingInMillis()).thenReturn(30000L);
         when(mockSaver.readStart()).thenReturn(date);
@@ -301,6 +288,14 @@ public class Class_Test {
         when(mockSaver.readStatus()).thenReturn(Game.GameStatus.GAME_STARTING);
 
         // If your actual code uses more methods from the saver or context, stub them here as well
+        assertEquals(mockSaver.readGameMode(), mode);
+        assertEquals(mockSaver.readLanguage(), eus);
+        assertEquals(mockSaver.readGameBoard(), boardLetterz);
+        assertEquals(mockSaver.readTimeRemainingInMillis(), 30000L);
+        assertEquals(mockSaver.readStart(), date);
+        assertEquals(mockSaver.readWords(), new String[] {"word1", "word2"});
+        assertEquals(mockSaver.readWordCount(), 1738);
+        assertEquals(mockSaver.readStatus(), Game.GameStatus.GAME_STARTING);
     }
 
 
