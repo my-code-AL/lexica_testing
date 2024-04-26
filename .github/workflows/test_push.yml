@@ -19,3 +19,6 @@ jobs:
 
       - name: Build and Test with Gradle
         run: ./gradlew :app:test
+
+      - name: Generate Spotbug Reports
+        run: ./gradlew check
