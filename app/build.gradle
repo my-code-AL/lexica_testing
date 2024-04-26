@@ -4,8 +4,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'de.mobilej.unmock'
 apply plugin: 'checkstyle'
-
-
+apply plugin: 'com.github.spotbugs'
 
 android {
     compileSdkVersion 33
@@ -70,6 +69,11 @@ android {
         // Ouptuts report during build, so that it can be seen in the CI log.
         textReport true
     }
+}
+
+spotbugs {
+    toolVersion = "4.5.0" // Specify the version of SpotBugs
+    ignoreFailures.set(true)
 }
 
 unMock {
